@@ -1,4 +1,5 @@
 import UIKit
+import Combine
 
 class ViewController: UIViewController {
     
@@ -10,14 +11,37 @@ class ViewController: UIViewController {
         return label
     }()
     
-    private lazy var button: UIButton = {
+    private lazy var textField: UITextField = {
+        let textField = UITextField()
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.layer.cornerRadius = 20
+        textField.layer.borderColor = UIColor.systemGray.cgColor
+        textField.layer.borderWidth = 3
+        textField.attributedPlaceholder = NSAttributedString(string: "Random Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
+        textField.textAlignment = .center
+        textField.isSecureTextEntry = true
+        return textField
+    }()
+    
+    private lazy var buttonRandomPassword: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 20
         button.setTitle("Change Color", for: .normal)
         button.setTitleColor(.black, for: .normal)
-        button.addTarget(self, action: #selector(tupButton), for: .touchUpInside)
+        button.addTarget(self, action: #selector(addRandomPasswordToTextField), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var buttonStop: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.backgroundColor = .systemBlue
+        button.layer.cornerRadius = 20
+        button.setTitle("Stop", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.addTarget(self, action: #selector(addRandomPasswordToTextField), for: .touchUpInside)
         return button
     }()
     
@@ -37,8 +61,14 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.bruteForce(passwordToUnlock: "123")
-        view.addSubview(button)
+//        let queue = DispatchQueue.global(qos: .utility)
+//        queue.async {
+//            self.bruteForce(passwordToUnlock: "0g")
+//        }
+
+        view.addSubview(buttonRandomPassword)
+        view.addSubview(buttonStop)
+        view.addSubview(textField)
         view.addSubview(label)
         setupLayout()
         
@@ -65,19 +95,43 @@ class ViewController: UIViewController {
     func setupLayout() {
         NSLayoutConstraint.activate([
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -100),
+            label.centerYAnchor.constraint(equalTo: textField.centerYAnchor, constant: 100),
             
-            button.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 50),
-            button.centerXAnchor.constraint(equalTo: label.centerXAnchor),
-            button.heightAnchor.constraint(equalToConstant: 50),
-            button.widthAnchor.constraint(equalToConstant: 150)
-        
+            buttonRandomPassword.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 50),
+            buttonRandomPassword.leadingAnchor.constraint(equalTo: view.leadingAnchor ,constant: 30),
+            buttonRandomPassword.heightAnchor.constraint(equalToConstant: 50),
+            buttonRandomPassword.widthAnchor.constraint(equalToConstant: 150),
+            
+            buttonStop.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 50),
+            buttonStop.trailingAnchor.constraint(equalTo: view.trailingAnchor ,constant: -30),
+            buttonStop.heightAnchor.constraint(equalToConstant: 50),
+            buttonStop.widthAnchor.constraint(equalToConstant: 150),
+            
+            textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+            textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
+            textField.heightAnchor.constraint(equalToConstant: 50),
+            textField.topAnchor.constraint(equalTo: view.topAnchor, constant: 200)
         ])
     }
     
-    @objc private func tupButton() {
-        isBlack.toggle()
+    @objc private func addRandomPasswordToTextField() {
+        textField.text = randomPassword()
+    }
+    
+    func randomPassword() -> String {
+        var characters = [Character]()
+        let symbols = Array(String().printable)
+        var password = String()
         
+        for _ in 0...symbols.count {
+            if characters.count < 4 {
+                let randomIndex = Int.random(in: 0..<symbols.count)
+                    characters.append(symbols[randomIndex])
+                    print(characters)
+            }
+        }
+        password = String(characters)
+        return  password
     }
 }
 
