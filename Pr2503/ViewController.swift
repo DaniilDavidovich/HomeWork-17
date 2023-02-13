@@ -1,11 +1,10 @@
 import UIKit
-import Combine
 
 class ViewController: UIViewController {
     
     private lazy var label: UILabel = {
         let label = UILabel()
-        label.text = "White"
+        label.text = "Your Password"
         label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -34,7 +33,7 @@ class ViewController: UIViewController {
         return button
     }()
     
-    private lazy var buttonStop: UIButton = {
+    private lazy var buttonPasswordSelection: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .systemBlue
@@ -45,16 +44,38 @@ class ViewController: UIViewController {
         return button
     }()
     
+    private lazy var buttonChangeColor: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.backgroundColor = .systemBlue
+        button.layer.cornerRadius = 20
+        button.setTitle("Change Color", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.addTarget(self, action: #selector(changeColor), for: .touchUpInside)
+        return button
+    }()
+    
+    private lazy var buttonStopSelection: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.backgroundColor = .systemBlue
+        button.layer.cornerRadius = 20
+        button.setTitle("Stop Selection", for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.addTarget(self, action: #selector(stopSelection), for: .touchUpInside)
+        return button
+    }()
+    
     var isBlack: Bool = false {
         didSet {
             if isBlack {
                 view.backgroundColor = .black
-                label.text = "Black"
                 label.textColor = .white
+                textField.textColor = .white
             } else {
                 self.view.backgroundColor = .white
-                label.text = "White"
                 label.textColor = .black
+                textField.textColor = .black
             }
         }
     }
@@ -63,9 +84,11 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         view.addSubview(buttonRandomPassword)
-        view.addSubview(buttonStop)
+        view.addSubview(buttonPasswordSelection)
         view.addSubview(textField)
         view.addSubview(label)
+        view.addSubview(buttonChangeColor)
+        view.addSubview(buttonStopSelection)
         setupLayout()
         
         
@@ -98,29 +121,48 @@ class ViewController: UIViewController {
             buttonRandomPassword.heightAnchor.constraint(equalToConstant: 50),
             buttonRandomPassword.widthAnchor.constraint(equalToConstant: 150),
             
-            buttonStop.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 50),
-            buttonStop.trailingAnchor.constraint(equalTo: view.trailingAnchor ,constant: -30),
-            buttonStop.heightAnchor.constraint(equalToConstant: 50),
-            buttonStop.widthAnchor.constraint(equalToConstant: 150),
+            buttonPasswordSelection.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 50),
+            buttonPasswordSelection.trailingAnchor.constraint(equalTo: view.trailingAnchor ,constant: -30),
+            buttonPasswordSelection.heightAnchor.constraint(equalToConstant: 50),
+            buttonPasswordSelection.widthAnchor.constraint(equalToConstant: 150),
             
             textField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
             textField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
             textField.heightAnchor.constraint(equalToConstant: 50),
-            textField.topAnchor.constraint(equalTo: view.topAnchor, constant: 200)
+            textField.topAnchor.constraint(equalTo: view.topAnchor, constant: 200),
+            
+            buttonChangeColor.topAnchor.constraint(equalTo: buttonRandomPassword.bottomAnchor, constant: 20),
+            buttonChangeColor.leadingAnchor.constraint(equalTo: buttonRandomPassword.leadingAnchor),
+            buttonChangeColor.heightAnchor.constraint(equalToConstant: 50),
+            buttonChangeColor.widthAnchor.constraint(equalToConstant: 150),
         ])
     }
     
     @objc private func passwordSelection() {
-        let queue = DispatchQueue.global(qos: .utility)
+        let queue = DispatchQueue.main
         queue.async {
             self.bruteForce(passwordToUnlock: self.textField.text ?? "")
+            self.textField.isSecureTextEntry = false
+            self.label.text = self.textField.text
         }
-        textField.isSecureTextEntry = false
-        label.text = textField.text
     }
     
     @objc private func addRandomPasswordToTextField() {
+        textField.isSecureTextEntry = true
+        label.text = "Your Password"
         textField.text = randomPassword()
+    }
+    
+    @objc private func changeColor() {
+        if isBlack == false {
+            isBlack = true
+        } else {
+            isBlack = false
+        }
+    }
+    
+    @objc private func stopSelection() {
+        
     }
     
     func randomPassword() -> String {
@@ -132,11 +174,11 @@ class ViewController: UIViewController {
             if characters.count < 4 {
                 let randomIndex = Int.random(in: 0..<symbols.count)
                     characters.append(symbols[randomIndex])
-                    print(characters)
             }
         }
         password = String(characters)
-        return  password
+        print(password)
+        return password
     }
 }
 
