@@ -28,7 +28,7 @@ class ViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 20
-        button.setTitle("Change Color", for: .normal)
+        button.setTitle("Generate Password", for: .normal)
         button.setTitleColor(.black, for: .normal)
         button.addTarget(self, action: #selector(addRandomPasswordToTextField), for: .touchUpInside)
         return button
@@ -39,9 +39,9 @@ class ViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 20
-        button.setTitle("Stop", for: .normal)
+        button.setTitle("Password selection", for: .normal)
         button.setTitleColor(.black, for: .normal)
-        button.addTarget(self, action: #selector(addRandomPasswordToTextField), for: .touchUpInside)
+        button.addTarget(self, action: #selector(passwordSelection), for: .touchUpInside)
         return button
     }()
     
@@ -61,10 +61,6 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        let queue = DispatchQueue.global(qos: .utility)
-//        queue.async {
-//            self.bruteForce(passwordToUnlock: "0g")
-//        }
 
         view.addSubview(buttonRandomPassword)
         view.addSubview(buttonStop)
@@ -114,13 +110,22 @@ class ViewController: UIViewController {
         ])
     }
     
+    @objc private func passwordSelection() {
+        let queue = DispatchQueue.global(qos: .utility)
+        queue.async {
+            self.bruteForce(passwordToUnlock: self.textField.text ?? "")
+        }
+        textField.isSecureTextEntry = false
+        label.text = textField.text
+    }
+    
     @objc private func addRandomPasswordToTextField() {
         textField.text = randomPassword()
     }
     
     func randomPassword() -> String {
         var characters = [Character]()
-        let symbols = Array(String().printable)
+        let symbols = Array(String().digits)
         var password = String()
         
         for _ in 0...symbols.count {
