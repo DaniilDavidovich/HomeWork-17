@@ -135,16 +135,46 @@ class ViewController: UIViewController {
             buttonChangeColor.leadingAnchor.constraint(equalTo: buttonRandomPassword.leadingAnchor),
             buttonChangeColor.heightAnchor.constraint(equalToConstant: 50),
             buttonChangeColor.widthAnchor.constraint(equalToConstant: 150),
+            
+            buttonStopSelection.topAnchor.constraint(equalTo: buttonPasswordSelection.bottomAnchor, constant: 20),
+            buttonStopSelection.trailingAnchor.constraint(equalTo: buttonPasswordSelection.trailingAnchor),
+            buttonStopSelection.heightAnchor.constraint(equalToConstant: 50),
+            buttonStopSelection.widthAnchor.constraint(equalToConstant: 150),
         ])
     }
     
     @objc private func passwordSelection() {
-        let queue = DispatchQueue.main
-        queue.async {
-            self.bruteForce(passwordToUnlock: self.textField.text ?? "")
-            self.textField.isSecureTextEntry = false
-            self.label.text = self.textField.text
+//        var text = self.textField.text ?? ""
+//        let queue = DispatchQueue(label: "Search Password", qos: .background)
+//        queue.async {
+//            self.bruteForce(passwordToUnlock: text)
+//            self.textField.isSecureTextEntry = false
+//            self.label.text = self.textField.text
+//        }
+        
+        
+        
+        
+        let text = self.textField.text ?? ""
+        let queue = DispatchGroup()
+
+        queue.enter()
+        let queueSearch = DispatchQueue(label: "Search Password", qos: .userInteractive)
+        queueSearch.async {
+            self.bruteForce(passwordToUnlock: text)
         }
+        queue.leave()
+
+        queue.enter()
+        self.textField.isSecureTextEntry = false
+        self.label.text = self.textField.text
+        queue.leave()
+
+        let queueType = DispatchQueue(label: "Search Password", qos: .background)
+        queue.notify(queue: queueType) {
+            print("All good")
+        }
+        
     }
     
     @objc private func addRandomPasswordToTextField() {
@@ -154,11 +184,13 @@ class ViewController: UIViewController {
     }
     
     @objc private func changeColor() {
-        if isBlack == false {
-            isBlack = true
-        } else {
-            isBlack = false
-        }
+//        let queue = DispatchQueue.main.async { [self] in
+            if isBlack == false {
+                isBlack = true
+            } else {
+                isBlack = false
+            }
+//        }
     }
     
     @objc private func stopSelection() {
