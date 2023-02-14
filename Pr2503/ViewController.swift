@@ -2,6 +2,8 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    //MARK: - UI Elements
+    
     private lazy var label: UILabel = {
         let label = UILabel()
         label.text = "Your Password"
@@ -65,6 +67,8 @@ class ViewController: UIViewController {
         return button
     }()
     
+    //MARK: - OBservers
+    
     var textLabel: String = "" {
         didSet {
             DispatchQueue.main.async {
@@ -97,37 +101,23 @@ class ViewController: UIViewController {
         }
     }
     
+    //MARK: - Lyfecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        setupHierachy()
+        setupLayout()
+    }
+    
+    //MARK: - Setups
+    
+    func setupHierachy() {
         view.addSubview(buttonRandomPassword)
         view.addSubview(buttonPasswordSelection)
         view.addSubview(textField)
         view.addSubview(label)
         view.addSubview(buttonChangeColor)
         view.addSubview(buttonStopSelection)
-        setupLayout()
-        
-        
-        // Do any additional setup after loading the view.
-    }
-    
-    func bruteForce(passwordToUnlock: String) {
-        let ALLOWED_CHARACTERS:   [String] = String().printable.map { String($0) }
-
-        var password: String = ""
-
-        // Will strangely ends at 0000 instead of ~~~
-        while password != passwordToUnlock { // Increase MAXIMUM_PASSWORD_SIZE value for more
-            password = generateBruteForce(password, fromArray: ALLOWED_CHARACTERS)
-//             Your stuff here
-            print(password)
-            textLabel = password
-            // Your stuff here
-        }
-        
-        
-        print(password)
     }
     
     func setupLayout() {
@@ -162,61 +152,28 @@ class ViewController: UIViewController {
         ])
     }
     
+    //MARK: - @objc Methods
+    
     @objc private func passwordSelection() {
-//        var text = self.textField.text ?? ""
-//        let queue = DispatchQueue(label: "Search Password", qos: .background)
-//        queue.async {
-//            self.bruteForce(passwordToUnlock: text)
-//            self.textField.isSecureTextEntry = false
-//            self.label.text = self.textField.text
-//        }
-        
-        
-        
-        
-//        let text = self.textField.text ?? ""
-//        let queue = DispatchGroup()
-//
-//        queue.enter()
-//        let queueSearch = DispatchQueue(label: "Search Password", qos: .userInteractive)
-//        queueSearch.async {
-//            self.bruteForce(passwordToUnlock: text)
-//        }
-//        queue.leave()
-//
-//        queue.enter()
-//        queueSearch.sync {
-//            self.textField.isSecureTextEntry = false
-//            self.label.text = self.textField.text
-//        }
-//        queue.leave()
-//
-//        let queueType = DispatchQueue(label: "Search Password", qos: .background)
-//        queue.notify(queue: queueType) {
-//            print("All good")
-//        }
         
         let text = self.textField.text ?? ""
 
         let task1 = BlockOperation {
+            
             let queueSearch = DispatchQueue(label: "Search", qos: .userInteractive)
             queueSearch.async {
                 self.bruteForce(passwordToUnlock: text)
-            }
-        }
-
-        let task2 = BlockOperation {
-            let queueSearch = DispatchQueue.main
-            queueSearch.async {
-                self.isSecureText = false
+                let queueSearch1 = DispatchQueue.main
+                queueSearch1.async {
+                    self.isSecureText = false
+                }
             }
         }
 
         let serialOperationQueue = OperationQueue()
-        let tasks = [task1, task2]
+        let tasks = [task1]
         serialOperationQueue.maxConcurrentOperationCount = 1
         serialOperationQueue.addOperations(tasks, waitUntilFinished: true)
-        
     }
     
     @objc private func addRandomPasswordToTextField() {
@@ -231,16 +188,34 @@ class ViewController: UIViewController {
             } else {
                 isBlack = false
             }
-
     }
     
     @objc private func stopSelection() {
-        
+       
+    
+    }
+    
+    //MARK: - Methods
+    
+    func bruteForce(passwordToUnlock: String) {
+        let ALLOWED_CHARACTERS:   [String] = String().printable.map { String($0) }
+
+        var password: String = ""
+
+        // Will strangely ends at 0000 instead of ~~~
+        while password != passwordToUnlock { // Increase MAXIMUM_PASSWORD_SIZE value for more
+            password = generateBruteForce(password, fromArray: ALLOWED_CHARACTERS)
+            // Your stuff here
+            print(password)
+            textLabel = password
+            // Your stuff here
+        }
+        print(password)
     }
     
     func randomPassword() -> String {
         var characters = [Character]()
-        let symbols = Array(String().digits)
+        let symbols = Array(String().printable)
         var password = String()
         
         for _ in 0...symbols.count {
@@ -249,23 +224,22 @@ class ViewController: UIViewController {
                     characters.append(symbols[randomIndex])
             }
         }
+        
         password = String(characters)
         print(password)
         return password
     }
 }
 
-
+//MARK: - Extension
 
 extension String {
-    var digits:      String { return "0123456789" }
-    var lowercase:   String { return "abcdefghijklmnopqrstuvwxyz" }
-    var uppercase:   String { return "ABCDEFGHIJKLMNOPQRSTUVWXYZ" }
+    var digits: String { return "0123456789" }
+    var lowercase: String { return "abcdefghijklmnopqrstuvwxyz" }
+    var uppercase: String { return "ABCDEFGHIJKLMNOPQRSTUVWXYZ" }
     var punctuation: String { return "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" }
-    var letters:     String { return lowercase + uppercase }
-    var printable:   String { return digits + letters + punctuation }
-
-
+    var letters: String { return lowercase + uppercase }
+    var printable: String { return digits + letters + punctuation }
 
     mutating func replace(at index: Int, with character: Character) {
         var stringArray = Array(self)
@@ -288,8 +262,7 @@ func generateBruteForce(_ string: String, fromArray array: [String]) -> String {
 
     if str.count <= 0 {
         str.append(characterAt(index: 0, array))
-    }
-    else {
+    } else {
         str.replace(at: str.count - 1,
                     with: characterAt(index: (indexOf(character: str.last!, array) + 1) % array.count, array))
 
@@ -297,7 +270,6 @@ func generateBruteForce(_ string: String, fromArray array: [String]) -> String {
             str = String(generateBruteForce(String(str.dropLast()), fromArray: array)) + String(str.last!)
         }
     }
-
     return str
 }
 
