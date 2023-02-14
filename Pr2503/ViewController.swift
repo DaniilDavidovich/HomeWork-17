@@ -18,7 +18,6 @@ class ViewController: UIViewController {
         textField.layer.borderWidth = 3
         textField.attributedPlaceholder = NSAttributedString(string: "Random Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
         textField.textAlignment = .center
-        textField.isSecureTextEntry = true
         return textField
     }()
     
@@ -186,8 +185,10 @@ class ViewController: UIViewController {
 //        queue.leave()
 //
 //        queue.enter()
-//        self.textField.isSecureTextEntry = false
-//        self.label.text = self.textField.text
+//        queueSearch.sync {
+//            self.textField.isSecureTextEntry = false
+//            self.label.text = self.textField.text
+//        }
 //        queue.leave()
 //
 //        let queueType = DispatchQueue(label: "Search Password", qos: .background)
@@ -196,17 +197,14 @@ class ViewController: UIViewController {
 //        }
         
         let text = self.textField.text ?? ""
-        let queue = OperationQueue()
-        
-        
-        
+
         let task1 = BlockOperation {
             let queueSearch = DispatchQueue(label: "Search", qos: .userInteractive)
-            queueSearch.sync {
+            queueSearch.async {
                 self.bruteForce(passwordToUnlock: text)
             }
         }
-        
+
         let task2 = BlockOperation {
             let queueSearch = DispatchQueue.main
             queueSearch.async {
@@ -214,11 +212,10 @@ class ViewController: UIViewController {
             }
         }
 
-        task1.addDependency(task2)
         let serialOperationQueue = OperationQueue()
         let tasks = [task1, task2]
-        queue.maxConcurrentOperationCount = 2
-        serialOperationQueue.addOperations(tasks, waitUntilFinished: false)
+        serialOperationQueue.maxConcurrentOperationCount = 1
+        serialOperationQueue.addOperations(tasks, waitUntilFinished: true)
         
     }
     
@@ -229,13 +226,12 @@ class ViewController: UIViewController {
     }
     
     @objc private func changeColor() {
-//        let queue = DispatchQueue.main.async { [self] in
             if isBlack == false {
                 isBlack = true
             } else {
                 isBlack = false
             }
-//        }
+
     }
     
     @objc private func stopSelection() {
@@ -248,7 +244,7 @@ class ViewController: UIViewController {
         var password = String()
         
         for _ in 0...symbols.count {
-            if characters.count < 4 {
+            if characters.count < 3 {
                 let randomIndex = Int.random(in: 0..<symbols.count)
                     characters.append(symbols[randomIndex])
             }
