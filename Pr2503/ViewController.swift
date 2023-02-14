@@ -66,6 +66,14 @@ class ViewController: UIViewController {
         return button
     }()
     
+    var textLabel: String = "" {
+        didSet {
+            DispatchQueue.main.async {
+                self.label.text = self.textLabel
+            }
+        }
+    }
+    
     var isBlack: Bool = false {
         didSet {
             if isBlack {
@@ -76,6 +84,16 @@ class ViewController: UIViewController {
                 self.view.backgroundColor = .white
                 label.textColor = .black
                 textField.textColor = .black
+            }
+        }
+    }
+    
+    var isSecureText: Bool = false {
+        didSet {
+            if isSecureText {
+                textField.isSecureTextEntry = true
+            } else {
+                textField.isSecureTextEntry = false
             }
         }
     }
@@ -105,8 +123,10 @@ class ViewController: UIViewController {
             password = generateBruteForce(password, fromArray: ALLOWED_CHARACTERS)
 //             Your stuff here
             print(password)
+            textLabel = password
             // Your stuff here
         }
+        
         
         print(password)
     }
@@ -155,30 +175,55 @@ class ViewController: UIViewController {
         
         
         
+//        let text = self.textField.text ?? ""
+//        let queue = DispatchGroup()
+//
+//        queue.enter()
+//        let queueSearch = DispatchQueue(label: "Search Password", qos: .userInteractive)
+//        queueSearch.async {
+//            self.bruteForce(passwordToUnlock: text)
+//        }
+//        queue.leave()
+//
+//        queue.enter()
+//        self.textField.isSecureTextEntry = false
+//        self.label.text = self.textField.text
+//        queue.leave()
+//
+//        let queueType = DispatchQueue(label: "Search Password", qos: .background)
+//        queue.notify(queue: queueType) {
+//            print("All good")
+//        }
+        
         let text = self.textField.text ?? ""
-        let queue = DispatchGroup()
-
-        queue.enter()
-        let queueSearch = DispatchQueue(label: "Search Password", qos: .userInteractive)
-        queueSearch.async {
-            self.bruteForce(passwordToUnlock: text)
+        let queue = OperationQueue()
+        
+        
+        
+        let task1 = BlockOperation {
+            let queueSearch = DispatchQueue(label: "Search", qos: .userInteractive)
+            queueSearch.sync {
+                self.bruteForce(passwordToUnlock: text)
+            }
         }
-        queue.leave()
-
-        queue.enter()
-        self.textField.isSecureTextEntry = false
-        self.label.text = self.textField.text
-        queue.leave()
-
-        let queueType = DispatchQueue(label: "Search Password", qos: .background)
-        queue.notify(queue: queueType) {
-            print("All good")
+        
+        let task2 = BlockOperation {
+            let queueSearch = DispatchQueue.main
+            queueSearch.async {
+                self.isSecureText = false
+            }
         }
+
+        task1.addDependency(task2)
+        let serialOperationQueue = OperationQueue()
+        let tasks = [task1, task2]
+        queue.maxConcurrentOperationCount = 2
+        serialOperationQueue.addOperations(tasks, waitUntilFinished: false)
         
     }
     
     @objc private func addRandomPasswordToTextField() {
-        textField.isSecureTextEntry = true
+        isSecureText = true
         label.text = "Your Password"
         textField.text = randomPassword()
     }
