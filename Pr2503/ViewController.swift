@@ -106,7 +106,9 @@ class ViewController: UIViewController {
                     self.textField.isSecureTextEntry = true
                 }
             } else {
-                textField.isSecureTextEntry = false
+                DispatchQueue.main.async {
+                    self.textField.isSecureTextEntry = false
+                }
             }
         }
     }
@@ -184,27 +186,17 @@ class ViewController: UIViewController {
             
         let text = self.textField.text ?? ""
         self.activituIndicator.startAnimating()
+        isStarted = true
         
         workItem = DispatchWorkItem {
             self.bruteForce(passwordToUnlock: text)
             
-            DispatchQueue.main.async {
-                self.isSecureText = false
-                self.activituIndicator.stopAnimating()
-                self.label.text = "Password is \(self.textField.text ?? "")."
-               
-           }
-            
-            DispatchQueue(label: "Sleep", qos: .userInteractive).async {
-                do {
-                    sleep(1)
-                    self.isSecureText = true
-                }
-            }
         }
         
-        DispatchQueue.global().async(execute: workItem!)
-        
+        if workItem != nil {
+            DispatchQueue.global().async(execute: workItem!)
+        }
+       
     }
     
     @objc private func addRandomPasswordToTextField() {
@@ -222,7 +214,7 @@ class ViewController: UIViewController {
     }
     
     @objc private func stopSelection() {
-        buttonStopSelection.isSelected = true
+        isStarted = false
     
     }
     
@@ -234,14 +226,48 @@ class ViewController: UIViewController {
         var password: String = ""
 
         // Will strangely ends at 0000 instead of ~~~
-        while password != passwordToUnlock { // Increase MAXIMUM_PASSWORD_SIZE value for more
-            password = generateBruteForce(password, fromArray: ALLOWED_CHARACTERS)
-            // Your stuff here
-            print(password)
-            textLabel = password
-            // Your stuff here
+        
+        while password != passwordToUnlock {
+            
+            if isStarted == false {
+                isStarted = true
+                password = generateBruteForce(password, fromArray: ALLOWED_CHARACTERS)
+                print(password)
+                textLabel = password
+                
+                if password == passwordToUnlock {
+                    
+                    DispatchQueue.main.async {
+                        self.isSecureText = false
+                        self.activituIndicator.stopAnimating()
+                   }
+                    
+                    DispatchQueue(label: "Sleep", qos: .userInteractive).async {
+                        do {
+                            sleep(1)
+                            self.isSecureText = true
+
+                        }
+                    }
+
+                }
+                
+            } else {
+                isStarted = false
+                password = "not found"
+                textLabel = password
+                
+                DispatchQueue.main.async {
+                    self.activituIndicator.stopAnimating()
+                }
+                
+                break
+            }
         }
-        print(password)
+        
+        self.textLabel = "Password is \(password)."
+
+        print("Password is \(password).")
     }
     
     func randomPassword() -> String {
