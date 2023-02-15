@@ -62,6 +62,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.hideKeyboardWhenTappedAround()
         addTarget()
     }
     
@@ -179,6 +180,7 @@ class ViewController: UIViewController {
         myView.buttonRandomPassword.addTarget(self, action: #selector(randomPassword), for: .touchUpInside)
         myView.buttonPasswordSelection.addTarget(self, action: #selector(passwordSelection), for: .touchUpInside)
     }
+    
 }
 
 //MARK: - Extension
@@ -222,4 +224,18 @@ func generateBruteForce(_ string: String, fromArray array: [String]) -> String {
     }
     return str
 }
+
+extension UIViewController {
+
+func hideKeyboardWhenTappedAround() {
+    let tap = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
+    tap.cancelsTouchesInView = false
+    view.addGestureRecognizer(tap)
+}
+
+@objc func dismissKeyboard() {
+    view.endEditing(true)
+    }
+}
+
 
