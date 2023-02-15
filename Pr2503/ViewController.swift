@@ -6,7 +6,7 @@ class ViewController: UIViewController {
     
     private lazy var label: UILabel = {
         let label = UILabel()
-        label.text = "Your Password"
+        label.text = "Your Password."
         label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -20,6 +20,7 @@ class ViewController: UIViewController {
         textField.layer.borderWidth = 3
         textField.attributedPlaceholder = NSAttributedString(string: "Random Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
         textField.textAlignment = .center
+        textField.isSecureTextEntry = true
         return textField
     }()
     
@@ -67,7 +68,14 @@ class ViewController: UIViewController {
         return button
     }()
     
-    //MARK: - OBservers
+    private lazy var activituIndicator: UIActivityIndicatorView = {
+        let activituIndicator = UIActivityIndicatorView(style: .large)
+        activituIndicator.isHidden = true
+        activituIndicator.translatesAutoresizingMaskIntoConstraints = false
+        return activituIndicator
+    }()
+    
+    //MARK: - Observers
     
     var textLabel: String = "" {
         didSet {
@@ -94,12 +102,24 @@ class ViewController: UIViewController {
     var isSecureText: Bool = false {
         didSet {
             if isSecureText {
-                textField.isSecureTextEntry = true
+                DispatchQueue.main.async {
+                    self.textField.isSecureTextEntry = true
+                }
             } else {
                 textField.isSecureTextEntry = false
             }
         }
     }
+    
+    var isStarted: Bool = false {
+        didSet {
+            if isStarted {
+                isStarted = false
+            } else {
+                isStarted = true
+                }
+            }
+        }
     
     //MARK: - Lyfecycle
     
@@ -118,6 +138,7 @@ class ViewController: UIViewController {
         view.addSubview(label)
         view.addSubview(buttonChangeColor)
         view.addSubview(buttonStopSelection)
+        view.addSubview(activituIndicator)
     }
     
     func setupLayout() {
@@ -149,36 +170,46 @@ class ViewController: UIViewController {
             buttonStopSelection.trailingAnchor.constraint(equalTo: buttonPasswordSelection.trailingAnchor),
             buttonStopSelection.heightAnchor.constraint(equalToConstant: 50),
             buttonStopSelection.widthAnchor.constraint(equalToConstant: 150),
+            
+            activituIndicator.topAnchor.constraint(equalTo: label.topAnchor, constant: -10),
+            activituIndicator.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40)
         ])
     }
     
     //MARK: - @objc Methods
+    var workItem: DispatchWorkItem?
+    
     
     @objc private func passwordSelection() {
-        
-        let text = self.textField.text ?? ""
-
-        let task1 = BlockOperation {
             
-            let queueSearch = DispatchQueue(label: "Search", qos: .userInteractive)
-            queueSearch.async {
-                self.bruteForce(passwordToUnlock: text)
-                let queueSearch1 = DispatchQueue.main
-                queueSearch1.async {
-                    self.isSecureText = false
+        let text = self.textField.text ?? ""
+        self.activituIndicator.startAnimating()
+        
+        workItem = DispatchWorkItem {
+            self.bruteForce(passwordToUnlock: text)
+            
+            DispatchQueue.main.async {
+                self.isSecureText = false
+                self.activituIndicator.stopAnimating()
+                self.label.text = "Password is \(self.textField.text ?? "")."
+               
+           }
+            
+            DispatchQueue(label: "Sleep", qos: .userInteractive).async {
+                do {
+                    sleep(1)
+                    self.isSecureText = true
                 }
             }
         }
-
-        let serialOperationQueue = OperationQueue()
-        let tasks = [task1]
-        serialOperationQueue.maxConcurrentOperationCount = 1
-        serialOperationQueue.addOperations(tasks, waitUntilFinished: true)
+        
+        DispatchQueue.global().async(execute: workItem!)
+        
     }
     
     @objc private func addRandomPasswordToTextField() {
         isSecureText = true
-        label.text = "Your Password"
+        label.text = "Your Password."
         textField.text = randomPassword()
     }
     
@@ -191,7 +222,7 @@ class ViewController: UIViewController {
     }
     
     @objc private func stopSelection() {
-       
+        buttonStopSelection.isSelected = true
     
     }
     
