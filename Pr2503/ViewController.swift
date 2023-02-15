@@ -119,9 +119,9 @@ class ViewController: UIViewController {
                 isStarted = false
             } else {
                 isStarted = true
-                }
             }
         }
+    }
     
     //MARK: - Lyfecycle
     
@@ -179,8 +179,8 @@ class ViewController: UIViewController {
     }
     
     //MARK: - @objc Methods
-    var workItem: DispatchWorkItem?
     
+    var workItem: DispatchWorkItem?
     
     @objc private func passwordSelection() {
             
@@ -190,13 +190,11 @@ class ViewController: UIViewController {
         
         workItem = DispatchWorkItem {
             self.bruteForce(passwordToUnlock: text)
-            
         }
         
         if workItem != nil {
             DispatchQueue.global().async(execute: workItem!)
         }
-       
     }
     
     @objc private func addRandomPasswordToTextField() {
@@ -215,7 +213,6 @@ class ViewController: UIViewController {
     
     @objc private func stopSelection() {
         isStarted = false
-    
     }
     
     //MARK: - Methods
@@ -225,11 +222,10 @@ class ViewController: UIViewController {
 
         var password: String = ""
 
-        // Will strangely ends at 0000 instead of ~~~
-        
         while password != passwordToUnlock {
             
             if isStarted == false {
+                
                 isStarted = true
                 password = generateBruteForce(password, fromArray: ALLOWED_CHARACTERS)
                 print(password)
@@ -266,7 +262,6 @@ class ViewController: UIViewController {
         }
         
         self.textLabel = "Password is \(password)."
-
         print("Password is \(password).")
     }
     
