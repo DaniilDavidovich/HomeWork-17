@@ -10,6 +10,7 @@ class ViewController: UIViewController {
     
     var textLabel: String = "" {
         didSet {
+            
             DispatchQueue.main.async {
                 self.myView.label.text = self.textLabel
             }
@@ -80,9 +81,8 @@ class ViewController: UIViewController {
             self.bruteForce(passwordToUnlock: text)
         }
         
-        if workItem != nil {
-            DispatchQueue.global().async(execute: workItem!)
-        }
+        if let workItem { DispatchQueue.global().async(execute: workItem) }
+        
     }
     
     @objc func addRandomPasswordToTextField() {
@@ -92,7 +92,7 @@ class ViewController: UIViewController {
     }
     
     @objc func changeColor() {
-            if isBlack == false {
+            if !isBlack {
                 isBlack = true
             } else {
                 isBlack = false
@@ -120,22 +120,6 @@ class ViewController: UIViewController {
                 print(password)
                 textLabel = password
                 
-                if password == passwordToUnlock {
-                    
-                    DispatchQueue.main.async {
-                        self.isSecureText = false
-                        self.myView.activituIndicator.stopAnimating()
-                   }
-                    
-                    DispatchQueue(label: "Sleep", qos: .userInteractive).async {
-                        do {
-                            sleep(1)
-                            self.isSecureText = true
-
-                        }
-                    }
-                }
-                
             } else {
                 isStarted = false
                 password = "not found"
@@ -149,6 +133,18 @@ class ViewController: UIViewController {
             }
         }
         
+        if password == passwordToUnlock {
+            
+            DispatchQueue.main.async {
+                self.isSecureText = false
+                self.myView.activituIndicator.stopAnimating()
+           }
+            
+            DispatchQueue(label: "Sleep", qos: .userInteractive).async {
+                    sleep(1)
+                    self.isSecureText = true
+            }
+        }
         self.textLabel = "Password is \(password)."
         print("Password is \(password).")
     }
@@ -177,10 +173,9 @@ class ViewController: UIViewController {
     func addTarget() {
         myView.buttonChangeColor.addTarget(self, action: #selector(changeColor), for: .touchUpInside)
         myView.buttonStopSelection.addTarget(self, action: #selector(stopSelection), for: .touchUpInside)
-        myView.buttonRandomPassword.addTarget(self, action: #selector(randomPassword), for: .touchUpInside)
+        myView.buttonRandomPassword.addTarget(self, action: #selector(addRandomPasswordToTextField), for: .touchUpInside)
         myView.buttonPasswordSelection.addTarget(self, action: #selector(passwordSelection), for: .touchUpInside)
     }
-    
 }
 
 //MARK: - Extension
@@ -237,5 +232,4 @@ func hideKeyboardWhenTappedAround() {
     view.endEditing(true)
     }
 }
-
 

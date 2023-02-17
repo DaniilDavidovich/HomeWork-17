@@ -14,7 +14,6 @@ class View: UIView {
     lazy var label: UILabel = {
         let label = UILabel()
         label.text = "Your Password."
-        label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -28,6 +27,7 @@ class View: UIView {
         textField.attributedPlaceholder = NSAttributedString(string: "Random Password", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray])
         textField.textAlignment = .center
         textField.isSecureTextEntry = true
+        textField.keyboardType = .alphabet
         return textField
     }()
     
@@ -46,7 +46,7 @@ class View: UIView {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .systemBlue
         button.layer.cornerRadius = 20
-        button.setTitle("Password selection", for: .normal)
+        button.setTitle("Crack password", for: .normal)
         button.setTitleColor(.black, for: .normal)
 
         return button
@@ -83,7 +83,7 @@ class View: UIView {
 
     init() {
         super.init(frame: .zero)
-        backgroundColor = .white
+        backgroundColor = .systemBackground
         setupHierachy()
         setupLayout()
     }
