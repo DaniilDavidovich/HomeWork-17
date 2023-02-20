@@ -74,7 +74,6 @@ class ViewController: UIViewController {
         }
         
         if let workItem { DispatchQueue.global().async(execute: workItem) }
-        
     }
     
     @objc func addRandomPasswordToTextField() {
@@ -111,16 +110,15 @@ class ViewController: UIViewController {
                 password = generateBruteForce(password, fromArray: allowedCharacters)
                 print(password)
                 textLabel = password
-                
             } else {
+                
                 isStarted = false
                 password = "not found"
                 textLabel = password
-                
+    
                 DispatchQueue.main.async {
                     self.myView.activituIndicator.stopAnimating()
                 }
-                
                 break
             }
         }

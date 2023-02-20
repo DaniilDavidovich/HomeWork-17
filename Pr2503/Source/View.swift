@@ -60,7 +60,6 @@ class View: UIView {
         button.layer.cornerRadius = 20
         button.setTitle("Crack password", for: .normal)
         button.setTitleColor(.black, for: .normal)
-
         return button
     }()
     
