@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(iOS 15.0, *)
 class View: UIView {
     
     //MARK: - UI Elements
@@ -15,7 +16,18 @@ class View: UIView {
         let label = UILabel()
         label.text = "Your Password."
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .systemFont(ofSize: 30, weight: .medium)
         return label
+    }()
+    
+   lazy var imageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "heart"))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+       imageView.tintColor = .systemCyan
+        imageView.backgroundColor = .systemGray3
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 20
+        return imageView
     }()
     
     lazy var textField: UITextField = {
@@ -34,7 +46,7 @@ class View: UIView {
     lazy var buttonRandomPassword: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .systemBlue
+        button.backgroundColor = .systemGray3
         button.layer.cornerRadius = 20
         button.setTitle("Generate Password", for: .normal)
         button.setTitleColor(.black, for: .normal)
@@ -44,7 +56,7 @@ class View: UIView {
     lazy var buttonPasswordSelection: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .systemBlue
+        button.backgroundColor = .systemGray3
         button.layer.cornerRadius = 20
         button.setTitle("Crack password", for: .normal)
         button.setTitleColor(.black, for: .normal)
@@ -55,9 +67,9 @@ class View: UIView {
     lazy var buttonChangeColor: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .systemBlue
+        button.backgroundColor = .systemGray3
         button.layer.cornerRadius = 20
-        button.setTitle("Change Color", for: .normal)
+        button.setTitle("Change Color Heart", for: .normal)
         button.setTitleColor(.black, for: .normal)
         return button
     }()
@@ -65,7 +77,7 @@ class View: UIView {
     lazy var buttonStopSelection: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.backgroundColor = .systemBlue
+        button.backgroundColor = .systemGray3
         button.layer.cornerRadius = 20
         button.setTitle("Stop Selection", for: .normal)
         button.setTitleColor(.black, for: .normal)
@@ -103,40 +115,47 @@ class View: UIView {
         addSubview(buttonChangeColor)
         addSubview(buttonStopSelection)
         addSubview(activituIndicator)
+        addSubview(imageView)
     }
     
     func setupLayout() {
         NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: textField.centerYAnchor, constant: 100),
             
-            buttonRandomPassword.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 50),
+            imageView.topAnchor.constraint(equalTo: topAnchor, constant: 75),
+            imageView.leadingAnchor.constraint(equalTo: buttonChangeColor.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: buttonStopSelection.trailingAnchor),
+            imageView.bottomAnchor.constraint(equalTo: label.topAnchor, constant: -40),
+            
+            label.leadingAnchor.constraint(equalTo: buttonChangeColor.leadingAnchor),
+            label.centerYAnchor.constraint(equalTo: textField.centerYAnchor, constant: -75),
+            
+            buttonRandomPassword.bottomAnchor.constraint(equalTo: buttonChangeColor.topAnchor, constant: -13),
             buttonRandomPassword.leadingAnchor.constraint(equalTo: leadingAnchor ,constant: 30),
-            buttonRandomPassword.heightAnchor.constraint(equalToConstant: 50),
-            buttonRandomPassword.widthAnchor.constraint(equalToConstant: 150),
+            buttonRandomPassword.heightAnchor.constraint(equalToConstant: 120),
+            buttonRandomPassword.widthAnchor.constraint(equalToConstant: 160),
             
-            buttonPasswordSelection.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 50),
+            buttonPasswordSelection.topAnchor.constraint(equalTo: buttonRandomPassword.topAnchor),
             buttonPasswordSelection.trailingAnchor.constraint(equalTo: trailingAnchor ,constant: -30),
-            buttonPasswordSelection.heightAnchor.constraint(equalToConstant: 50),
-            buttonPasswordSelection.widthAnchor.constraint(equalToConstant: 150),
+            buttonPasswordSelection.heightAnchor.constraint(equalToConstant: 120),
+            buttonPasswordSelection.widthAnchor.constraint(equalToConstant: 160),
             
-            textField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 30),
-            textField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -30),
+            textField.bottomAnchor.constraint(equalTo: buttonRandomPassword.topAnchor, constant: -50),
+            textField.trailingAnchor.constraint(equalTo: buttonStopSelection.trailingAnchor),
+            textField.leadingAnchor.constraint(equalTo: buttonChangeColor.leadingAnchor),
             textField.heightAnchor.constraint(equalToConstant: 50),
-            textField.topAnchor.constraint(equalTo: topAnchor, constant: 200),
-            
-            buttonChangeColor.topAnchor.constraint(equalTo: buttonRandomPassword.bottomAnchor, constant: 20),
+          
+            buttonChangeColor.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -50),
             buttonChangeColor.leadingAnchor.constraint(equalTo: buttonRandomPassword.leadingAnchor),
-            buttonChangeColor.heightAnchor.constraint(equalToConstant: 50),
-            buttonChangeColor.widthAnchor.constraint(equalToConstant: 150),
+            buttonChangeColor.heightAnchor.constraint(equalToConstant: 120),
+            buttonChangeColor.widthAnchor.constraint(equalToConstant: 160),
             
-            buttonStopSelection.topAnchor.constraint(equalTo: buttonPasswordSelection.bottomAnchor, constant: 20),
+            buttonStopSelection.topAnchor.constraint(equalTo: buttonChangeColor.topAnchor),
             buttonStopSelection.trailingAnchor.constraint(equalTo: buttonPasswordSelection.trailingAnchor),
-            buttonStopSelection.heightAnchor.constraint(equalToConstant: 50),
-            buttonStopSelection.widthAnchor.constraint(equalToConstant: 150),
+            buttonStopSelection.heightAnchor.constraint(equalToConstant: 120),
+            buttonStopSelection.widthAnchor.constraint(equalToConstant: 160),
             
-            activituIndicator.topAnchor.constraint(equalTo: label.topAnchor, constant: -10),
-            activituIndicator.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -40)
+            activituIndicator.centerYAnchor.constraint(equalTo: label.centerYAnchor),
+            activituIndicator.trailingAnchor.constraint(equalTo: buttonPasswordSelection.trailingAnchor)
         ])
     }
 }

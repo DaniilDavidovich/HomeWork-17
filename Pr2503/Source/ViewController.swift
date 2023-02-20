@@ -1,5 +1,6 @@
 import UIKit
 
+@available(iOS 15.0, *)
 class ViewController: UIViewController {
     
     private lazy var myView: View = {
@@ -16,14 +17,13 @@ class ViewController: UIViewController {
         }
     }
     
-    var isBlack: Bool = false {
+    var isPink: Bool = false {
         didSet {
-            if traitCollection.userInterfaceStyle == .dark {
-                self.overrideUserInterfaceStyle = .light
+            if isPink {
+                myView.imageView.tintColor = .systemPink
             } else {
-                self.overrideUserInterfaceStyle = .dark
+                myView.imageView.tintColor = .systemCyan
             }
-
         }
     }
     
@@ -84,10 +84,10 @@ class ViewController: UIViewController {
     }
     
     @objc func changeColor() {
-            if !isBlack {
-                isBlack = true
+            if !isPink {
+                isPink = true
             } else {
-                isBlack = false
+                isPink = false
             }
     }
     

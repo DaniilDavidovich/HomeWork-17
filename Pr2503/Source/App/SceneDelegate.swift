@@ -1,5 +1,6 @@
 import UIKit
 
+@available(iOS 15.0, *)
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
