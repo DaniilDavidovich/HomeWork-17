@@ -10,7 +10,6 @@ class ViewController: UIViewController {
     
     var textLabel: String = "" {
         didSet {
-            
             DispatchQueue.main.async {
                 self.myView.label.text = self.textLabel
             }
@@ -19,15 +18,12 @@ class ViewController: UIViewController {
     
     var isBlack: Bool = false {
         didSet {
-            if isBlack {
-                myView.backgroundColor = .black
-                myView.label.textColor = .white
-                myView.textField.textColor = .white
+            if traitCollection.userInterfaceStyle == .dark {
+                self.overrideUserInterfaceStyle = .light
             } else {
-                myView.backgroundColor = .white
-                myView.label.textColor = .black
-                myView.textField.textColor = .black
+                self.overrideUserInterfaceStyle = .dark
             }
+
         }
     }
     
@@ -47,11 +43,7 @@ class ViewController: UIViewController {
     
     var isStarted: Bool = false {
         didSet {
-            if isStarted {
-                isStarted = false
-            } else {
-                isStarted = true
-            }
+            isStarted.toggle()
         }
     }
     
